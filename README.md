@@ -9,6 +9,15 @@ installs, updates, and configures itself on every start. Just run it.
 
 ---
 
+## Setup Methods
+
+There are two ways to deploy this server:
+
+1. **[Pre-built Image (recommended)](#method-1-pre-built-image-recommended)** -- Pull the ready-to-use image and start. No build needed.
+2. **[Build from Source](#method-2-build-from-source)** -- Clone the repository and build the image yourself.
+
+---
+
 ## Requirements
 
 | Component | Minimum | Recommended |
@@ -20,56 +29,89 @@ installs, updates, and configures itself on every start. Just run it.
 | Docker | Docker Engine 24+ | latest stable |
 | Docker Compose | v2 (included with Docker) | latest stable |
 
----
-
-## Quick Start (Step by Step)
-
-### 1. Install Docker (if not already installed)
+### Install Docker (if not already installed)
 
 ```bash
 curl -fsSL https://get.docker.com | sh
 ```
 
-### 2. Clone this repository
+---
+
+## Method 1: Pre-built Image (recommended)
+
+No cloning, no building. Just create a compose file and start.
+
+### 1. Create a directory
 
 ```bash
-git clone <REPO_URL> steam-palworld
-cd steam-palworld
+mkdir palworld-server && cd palworld-server
 ```
 
-### 3. Create your configuration
+### 2. Create docker-compose.yml
 
-```bash
-cp .env.example .env
+Create a file called `docker-compose.yml` with the following content:
+
+```yaml
+services:
+  palworld:
+    image: ghcr.io/rndmjoker/gameserver-steam-palworld:latest
+    container_name: palworld-server
+    restart: unless-stopped
+    network_mode: host
+    mem_limit: 12g
+    volumes:
+      - serverdata:/home/steam/serverdata
+      - serverconfig:/home/steam/serverconfig
+    environment:
+      - ServerName=My Palworld Server
+      - AdminPassword=changeme
+      - ServerPlayerMaxNum=32
+      - RCONEnabled=False
+      # Uncomment and adjust any setting you want to change.
+      # All other settings use official Palworld defaults.
+      # Full list: https://docs.palworldgame.com/settings-and-operation/configuration/
+      #
+      # ── Game Mode ──────────────────────────────────────────
+      # - Difficulty=None
+      # - bIsPvP=False
+      # - bHardcore=False
+      #
+      # ── Game Balance ───────────────────────────────────────
+      # - ExpRate=1.000000
+      # - DayTimeSpeedRate=1.000000
+      # - NightTimeSpeedRate=1.000000
+      # - PalCaptureRate=1.000000
+      # - PalSpawnNumRate=1.000000
+      # - DeathPenalty=All
+      #
+      # ── Features ───────────────────────────────────────────
+      # - bEnableInvaderEnemy=True
+      # - bEnableFastTravel=True
+      # - bShowPlayerList=True
+      #
+      # ── Server Management ─────────────────────────────────
+      # - bUseAuth=True
+      # - bIsUseBackupSaveData=True
+      # - ChatPostLimitPerMinute=10
+
+volumes:
+  serverdata:
+  serverconfig:
 ```
 
-Open the `.env` file and change at least these settings:
+### 3. Start the server
 
 ```bash
-nano .env
-```
-
-**Important settings to change:**
-- `ServerName` -- The name players see in the server browser
-- `AdminPassword` -- Password for admin commands (change from default!)
-- `ServerPassword` -- Leave empty for a public server, set a password for private
-- `ServerPlayerMaxNum` -- Maximum number of players (default: 32)
-
-Everything else works out of the box with official default values.
-
-### 4. Build and start the server
-
-```bash
-docker compose up -d --build
+docker compose up -d
 ```
 
 This will:
-1. Build the Docker image (first time only, takes ~1 minute)
+1. Pull the image from the registry (~900 MB download, first time only)
 2. Download the Palworld server via SteamCMD (~3.8 GB, first time only)
-3. Generate the configuration from your `.env` settings
+3. Generate the configuration from your environment settings
 4. Start the server
 
-### 5. Watch the progress
+### 4. Watch the progress
 
 ```bash
 docker compose logs -f
@@ -81,7 +123,51 @@ Wait until you see:
 Running Palworld dedicated server on :8211
 ```
 
-That means the server is ready for connections. Press `Ctrl+C` to stop watching logs (the server keeps running).
+That means the server is ready. Press `Ctrl+C` to stop watching (the server keeps running).
+
+---
+
+## Method 2: Build from Source
+
+Clone the full repository and build the Docker image yourself.
+This is useful if you want to modify the Dockerfile or hook scripts.
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/RndmJoker/gameserver-steam-palworld.git steam-palworld
+cd steam-palworld
+```
+
+### 2. Create your configuration
+
+```bash
+cp .env.example .env
+nano .env
+```
+
+**Important settings to change:**
+- `ServerName` -- The name players see in the server browser
+- `AdminPassword` -- Password for admin commands (change from default!)
+- `ServerPassword` -- Leave empty for a public server, set a password for private
+- `ServerPlayerMaxNum` -- Maximum number of players (default: 32)
+
+Everything else works out of the box with official default values.
+See [.env.example](.env.example) for the full list of available settings.
+
+### 3. Build and start
+
+```bash
+docker compose up -d --build
+```
+
+### 4. Watch the progress
+
+```bash
+docker compose logs -f
+```
+
+Wait until you see `Running Palworld dedicated server on :8211`.
 
 ---
 
@@ -123,7 +209,12 @@ open firewall ports on external firewalls.
 All server settings are controlled through environment variables.
 There are two ways to set them:
 
-### Option A: Via `.env` file (recommended for docker compose)
+### Option A: Directly in docker-compose.yml (recommended for Portainer)
+
+All settings are listed in the `environment:` section of the
+[docker-compose.yml](docker-compose.yml). Uncomment and change what you need.
+
+### Option B: Via .env file (recommended for self-builds)
 
 Edit the [.env](.env.example) file:
 
@@ -132,73 +223,14 @@ nano .env
 docker compose restart
 ```
 
-### Option B: Directly in docker-compose.yml (recommended for Portainer)
-
-All settings are listed in the `environment:` section of the
-[docker-compose.yml](docker-compose.yml). Uncomment and change what you need.
-
 ### How defaults work
 
 You do **not** need to set every value. The server has built-in defaults for
 ALL settings (see [hooks/defaults.sh](hooks/defaults.sh)). If a setting is not
-defined in your `.env` or `docker-compose.yml`, the official Palworld default
-value is used automatically.
+defined, the official Palworld default value is used automatically.
 
 For a full description of what each setting does, see the
 [official Palworld configuration docs](https://docs.palworldgame.com/settings-and-operation/configuration/).
-
----
-
-## Deployment Examples
-
-### docker-compose (recommended)
-
-The [docker-compose.yml](docker-compose.yml) in this repo is a complete,
-self-contained stack. It can be pasted directly into Portainer or Dockhand.
-
-Minimal example showing only the most common settings:
-
-```yaml
-services:
-  palworld:
-    build: .
-    container_name: palworld-server
-    restart: unless-stopped
-    network_mode: host
-    mem_limit: 12g
-    volumes:
-      - serverdata:/home/steam/serverdata
-      - serverconfig:/home/steam/serverconfig
-    environment:
-      - ServerName=My Palworld Server
-      - AdminPassword=changeme
-      - ServerPlayerMaxNum=32
-      - RCONEnabled=False
-      # All other settings use official defaults.
-      # See the full docker-compose.yml for ALL available settings.
-
-volumes:
-  serverdata:
-  serverconfig:
-```
-
-### docker run
-
-```bash
-# 1. Build the image
-docker build -t palworld-server .
-
-# 2. Start the server
-docker run -d \
-  --name palworld-server \
-  --restart unless-stopped \
-  --network host \
-  --env-file .env \
-  --memory 12g \
-  -v serverdata:/home/steam/serverdata \
-  -v serverconfig:/home/steam/serverconfig \
-  palworld-server
-```
 
 ---
 
@@ -237,10 +269,10 @@ If you want to restart without checking for game updates:
 
 ```bash
 docker compose down
-docker compose up -d -e SKIP_STEAM_UPDATE=true
+SKIP_STEAM_UPDATE=true docker compose up -d
 ```
 
-### Rebuild the image after framework updates
+### Rebuild the image (self-build only)
 
 ```bash
 docker compose up -d --build
@@ -303,7 +335,7 @@ docker logs palworld-server 2>&1 | tail -50
 
 ## Architecture
 
-This server uses the [steam-server-base](https://github.com/rndmjoker/gameserver-steam-basic)
+This server is built on the [steam-server-base](https://github.com/rndmjoker/gameserver-steam-basic)
 framework which provides:
 
 - Automatic SteamCMD game updates on every container start
@@ -314,7 +346,7 @@ framework which provides:
 ### How the config system works
 
 1. [hooks/defaults.sh](hooks/defaults.sh) sets official defaults for ALL parameters
-2. Your `.env` file overrides only the settings you change
+2. Your environment variables override only the settings you change
 3. `envsubst` generates `PalWorldSettings.ini` from the template
 4. The config is copied to the correct game directory automatically
 

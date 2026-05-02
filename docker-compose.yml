@@ -14,9 +14,9 @@ services:
   palworld:
     # -- Use ONE of the following: --
     # For pre-built image (pull from registry):
-    # image: gitea.br-hosting.com/joker/gameserver-steam-palworld:latest
+    image: ghcr.io/rndmjoker/gameserver-steam-palworld:latest
     # For local build (requires Dockerfile):
-    build: .
+    # build: .
     container_name: palworld-server
     restart: unless-stopped
     network_mode: host
