@@ -23,32 +23,36 @@ services:
     volumes:
       - serverdata:/home/steam/serverdata
       - serverconfig:/home/steam/serverconfig
-    # When using bridge networking instead of host mode, uncomment
-    # ports and comment out network_mode above:
+    # When using bridge networking instead of host mode, comment out
+    # network_mode above and uncomment ports below. The left side is the
+    # external port (changeable), the right side is the internal port
+    # (must match GAME_PORT / RCON_PORT in environment):
     # ports:
-    #   - "${GAME_PORT:-8211}:${GAME_PORT:-8211}/udp"
-    #   - "${RCON_PORT:-25575}:${RCON_PORT:-25575}/tcp"
+    #   - "8211:8211/udp"
+    #   - "25575:25575/tcp"
     mem_limit: ${MEM_LIMIT:-12g}
     environment:
       # ── Docker Infrastructure ─────────────────────────────
-      - GAME_PORT=${GAME_PORT:-8211}
-      - RCON_PORT=${RCON_PORT:-25575}
-      - MEM_LIMIT=${MEM_LIMIT:-12g}
+      # GAME_PORT controls which port the server listens on.
+      # With host mode this is the port on your machine directly.
+      - GAME_PORT=8211
+      - RCON_PORT=25575
+      # - MEM_LIMIT=12g
       # - STEAM_LOGIN=anonymous
       # - SKIP_STEAM_UPDATE=false
       # - GAME_ARGS=
 
       # ── Server Identity ───────────────────────────────────
-      - ServerName=${ServerName:-My Palworld Server}
-      - ServerDescription=${ServerDescription:-}
-      - ServerPassword=${ServerPassword:-}
-      - AdminPassword=${AdminPassword:-changeme}
-      - ServerPlayerMaxNum=${ServerPlayerMaxNum:-32}
+      - ServerName=My Palworld Server
+      - ServerDescription=
+      - ServerPassword=
+      - AdminPassword=changeme
+      - ServerPlayerMaxNum=32
       # - PublicIP=
       # - Region=
 
       # ── RCON and REST API ─────────────────────────────────
-      - RCONEnabled=${RCONEnabled:-False}
+      - RCONEnabled=False
       # - RESTAPIEnabled=False
       # - RESTAPIPort=8212
 

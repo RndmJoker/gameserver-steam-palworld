@@ -287,11 +287,17 @@ docker compose restart
 
 ### Skip the update (faster restart)
 
-If you want to restart without checking for game updates:
+If you want to restart without checking for game updates, set the
+environment variable in your `docker-compose.yml`:
+
+```yaml
+      - SKIP_STEAM_UPDATE=true
+```
+
+Then restart:
 
 ```bash
-docker compose down
-SKIP_STEAM_UPDATE=true docker compose up -d
+docker compose restart
 ```
 
 ### Rebuild the image (self-build only)
