@@ -29,7 +29,7 @@ All server settings are controlled via environment variables in `.env`.
 See [.env.example](.env.example) for the full list of available options with descriptions.
 
 **Default values are built in.** If a setting is not defined in `.env`, the server
-automatically falls back to the official Palworld default (see `hooks/defaults.sh`).
+automatically falls back to the official Palworld default (see [hooks/defaults.sh](hooks/defaults.sh)).
 
 For a complete description of all parameters, see the
 [official Palworld configuration docs](https://docs.palworldgame.com/settings-and-operation/configuration/).
@@ -42,7 +42,7 @@ docker compose restart
 
 ## Deployment Examples
 
-The `docker-compose.yml` in this repo is a complete, self-contained stack.
+The [docker-compose.yml](docker-compose.yml) in this repo is a complete, self-contained stack.
 All settings are defined inline and can be pasted directly into Portainer or Dockhand.
 
 ### docker-compose.yml (minimal)
@@ -64,7 +64,7 @@ services:
       - AdminPassword=changeme
       - ServerPlayerMaxNum=32
       - RCONEnabled=False
-      # See docker-compose.yml for ALL available settings
+      # See the full docker-compose.yml for ALL available settings
 
 volumes:
   serverdata:
