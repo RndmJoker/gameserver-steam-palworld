@@ -23,3 +23,4 @@ COPY config/ /home/steam/serverconfig/
 
 # ── Expose ports ────────────────────────────────────────────
 EXPOSE 8211/udp
+EXPOSE 25575/tcp
