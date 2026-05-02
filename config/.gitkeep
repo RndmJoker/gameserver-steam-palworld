@@ -1,0 +1,2 @@
+# Place config templates here (e.g. GameSettings.ini.template)
+# They will be processed by envsubst on container start.

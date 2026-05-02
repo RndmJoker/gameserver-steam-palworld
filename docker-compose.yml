@@ -1,0 +1,23 @@
+services:
+  palworld:
+    build: .
+    container_name: palworld-server
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - serverdata:/home/steam/serverdata
+      - serverconfig:/home/steam/serverconfig
+    ports:
+      - "${GAME_PORT:-8211}:8211/udp"
+      - "${RCON_PORT:-25575}:25575/tcp"
+    # Uncomment for games with NAT issues:
+    # network_mode: host
+    mem_limit: 12g
+    # Override game arguments if needed:
+    # environment:
+    #   - GAME_ARGS="-custom -flags"
+
+volumes:
+  serverdata:
+  serverconfig:
