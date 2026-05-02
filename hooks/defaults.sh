@@ -9,6 +9,9 @@
 # Sourced by pre-setup.sh BEFORE envsubst processes templates.
 # ============================================================
 
+# Enable auto-export so envsubst can see all variables
+set -a
+
 # ── Server Management ───────────────────────────────────────
 : "${ServerName:=My Palworld Server}"
 : "${ServerDescription:=}"
@@ -134,5 +137,5 @@
 : "${RespawnPenaltyTimeScale:=1.000000}"
 : "${SupplyDropSpan:=180}"
 
-# Export all for envsubst
-set -a
+# Disable auto-export
+set +a

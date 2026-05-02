@@ -14,19 +14,20 @@ services:
   palworld:
     # -- Use ONE of the following: --
     # For pre-built image (pull from registry):
-    image: gitea.br-hosting.com/joker/gameserver-steam-palworld:latest
+    # image: gitea.br-hosting.com/joker/gameserver-steam-palworld:latest
     # For local build (requires Dockerfile):
-    # build: .
+    build: .
     container_name: palworld-server
     restart: unless-stopped
+    network_mode: host
     volumes:
       - serverdata:/home/steam/serverdata
       - serverconfig:/home/steam/serverconfig
-    ports:
-      - "${GAME_PORT:-8211}:${GAME_PORT:-8211}/udp"
-      - "${RCON_PORT:-25575}:${RCON_PORT:-25575}/tcp"
-    # Uncomment for games with NAT issues:
-    # network_mode: host
+    # When using bridge networking instead of host mode, uncomment
+    # ports and comment out network_mode above:
+    # ports:
+    #   - "${GAME_PORT:-8211}:${GAME_PORT:-8211}/udp"
+    #   - "${RCON_PORT:-25575}:${RCON_PORT:-25575}/tcp"
     mem_limit: ${MEM_LIMIT:-12g}
     environment:
       # ── Docker Infrastructure ─────────────────────────────
