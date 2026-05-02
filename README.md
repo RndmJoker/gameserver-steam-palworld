@@ -99,6 +99,11 @@ volumes:
   serverconfig:
 ```
 
+This is a minimal example with only the most important settings.
+For the **complete list of all available settings** (101 parameters), see the
+full [docker-compose.yml](docker-compose.yml) in this repository. You can use
+it as a drop-in replacement -- just copy it and adjust what you need.
+
 ### 3. Start the server
 
 ```bash
@@ -124,6 +129,23 @@ Running Palworld dedicated server on :8211
 ```
 
 That means the server is ready. Press `Ctrl+C` to stop watching (the server keeps running).
+
+### Alternative: docker run (without Compose)
+
+```bash
+docker run -d \
+  --name palworld-server \
+  --restart unless-stopped \
+  --network host \
+  --memory 12g \
+  -e ServerName="My Palworld Server" \
+  -e AdminPassword="changeme" \
+  -e ServerPlayerMaxNum=32 \
+  -e RCONEnabled=False \
+  -v serverdata:/home/steam/serverdata \
+  -v serverconfig:/home/steam/serverconfig \
+  ghcr.io/rndmjoker/gameserver-steam-palworld:latest
+```
 
 ---
 
